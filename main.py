@@ -2,7 +2,27 @@ from flask import Flask, request, jsonify
 import paypalrestsdk
 
 # Initialize Flask app
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'  # SQLite database file in project directory
+db = SQLAlchemy(app)
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(20), unique=True, nullable=False)
+    # Add more fields as needed
+
+class Content(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.String(20), nullable=False)
+    data = db.Column(db.String, nullable=False)
+    # Add more fields as needed
+
+# Initialize the database
+db.create_all()
+
 
 # Initialize PayPal SDK
 paypalrestsdk.configure({
