@@ -1,9 +1,8 @@
 from flask import Flask, request, jsonify
 import paypalrestsdk
-
-# Initialize Flask app
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'  # SQLite database file in project directory
@@ -22,6 +21,30 @@ class Content(db.Model):
 
 # Initialize the database
 db.create_all()
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+class User(db.Model, UserMixin):
+    class User(db.Model, UserMixin):
+    @login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+@app.route('/authenticate', methods=['POST'])
+def authenticate():
+    # Your user authentication logic here
+    user = User.query.filter_by(username=form_username).first()
+    if user and form_password == user.password:  # Replace with your actual validation
+        login_user(user)
+        return jsonify({'status': 'Authenticated'})
+    return jsonify({'status': 'Authentication failed'})
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return jsonify({'status': 'Logged out'})
+
 
 
 # Initialize PayPal SDK
