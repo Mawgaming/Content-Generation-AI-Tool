@@ -1,16 +1,41 @@
 from flask import Flask, request, jsonify
 import paypalrestsdk
-from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask_bcrypt import Bcrypt
+import cv2
+from transformers import GPT2LMHeadModel, GPT2Tokenizer
+mport cv2
+import numpy as np
+import pyttsx3
+mport cv2
+import numpy as np
+from PIL import Image, ImageFilter
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'  # SQLite database file in project directory
-db = SQLAlchemy(app)
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
-class User(db.Model):
+@app.route('/authenticate', methods=['POST'])
+def authenticate():
+    form_username = request.form.get('username')
+    form_password = request.form.get('password')
+    user = User.query.filter_by(username=form_username).first()
+    if user and bcrypt.check_password_hash(user.password, form_password):
+        login_user(user)
+        return jsonify({'status': 'Authenticated'})
+    return jsonify({'status': 'Authentication failed'})
+
+paypalrestsdk.configure({
+  'mode': 'sandbox',
+  'client_id': 'YOUR_CLIENT_ID',
+  'client_secret': 'YOUR_CLIENT_SECRET'
+})
+
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
+    password = db.Column(db.String(60), nullable=False)
     # Add more fields as needed
 
 class Content(db.Model):
@@ -22,37 +47,63 @@ class Content(db.Model):
 # Initialize the database
 db.create_all()
 
-login_manager = LoginManager()
-login_manager.init_app(app)
-
-class User(db.Model, UserMixin):
-    class User(db.Model, UserMixin):
-    @login_manager.user_loader
+@login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
 @app.route('/authenticate', methods=['POST'])
 def authenticate():
-    # Your user authentication logic here
+    form_username = request.form.get('username')
+    form_password = request.form.get('password')
     user = User.query.filter_by(username=form_username).first()
-    if user and form_password == user.password:  # Replace with your actual validation
+    if user and bcrypt.check_password_hash(user.password, form_password):
         login_user(user)
         return jsonify({'status': 'Authenticated'})
     return jsonify({'status': 'Authentication failed'})
 
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return jsonify({'status': 'Logged out'})
+@app.route('/process_payment', methods=['POST'])
+def process_payment():
+    payment = paypalrestsdk.Payment({
+        'intent': 'sale',
+        'payer': {
+            'payment_method': 'paypal'
+        },
+        'redirect_urls': {
+            'return_url': 'http://localhost:5000/payment_success',
+            'cancel_url': 'http://localhost:5000/payment_cancel'
+        },
+        'transactions': [{
+            'item_list': {
+                'items': [{
+                    'name': 'item',
+                    'sku': 'item',
+                    'price': '5.00',
+                    'currency': 'USD',
+                    'quantity': 1
+                }]
+            },
+            'amount': {
+                'total': '5.00',
+                'currency': 'USD'
+            },
+            'description': 'This is the payment transaction description.'
+        }]
+    })
 
+    if payment.create():
+        print('Payment created successfully')
+        for link in payment.links:
+            if link.method == 'REDIRECT':
+                redirect_url = link.href
+                return jsonify({'redirect_url': redirect_url})
+    else:
+        print(payment.error)
+        return jsonify({'status': 'Payment failed'})
 
+# Rest of your original code remains the same
 
-# Initialize PayPal SDK
-paypalrestsdk.configure({
-  'mode': 'sandbox',
-  'client_id': 'YOUR_CLIENT_ID',
-  'client_secret': 'YOUR_CLIENT_SECRET'
-})
+if __name__ == '__main__':
+    app.run(debug=True)
 
 @app.route('/generate_text', methods=['POST'])
 def generate_text():
