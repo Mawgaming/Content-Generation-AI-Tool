@@ -11,7 +11,25 @@ import pyttsx3
 mport cv2
 import numpy as np
 from PIL import Image, ImageFilter
+from flask import jsonify
 
+@app.route('/generate_voice_over', methods=['POST'])
+@login_required  # Assuming the user must be logged in to access this route
+def generate_voice_over():
+    user = current_user  # Assuming you have a current_user object
+
+    # Logic to check voice-over time limit
+    if user.voice_over_time_used >= 600:  # Assuming 600 seconds (or 10 minutes) is the limit
+        return jsonify({'status': 'Voice-over time limit reached'})
+
+    # Actual voice-over generation logic here
+    # ...
+
+    # Update the voice_over_time_used after successful generation
+    user.voice_over_time_used += length_of_voice_over  # Update this variable accordingly
+    db.session.commit()  # Don't forget to commit the changes to the database
+
+    return jsonify({'voice_over_url': 'Generated Voice-over URL'})
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -38,11 +56,13 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(60), nullable=False)
     # Add more fields as needed
 
-class Content(db.Model):
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.String(20), nullable=False)
-    data = db.Column(db.String, nullable=False)
+    username = db.Column(db.String(20), unique=True, nullable=False)
+    password = db.Column(db.String(60), nullable=False)
+    voice_over_time_used = db.Column(db.Integer, default=0)  # Add this line
     # Add more fields as needed
+
 
 # Initialize the database
 db.create_all()
@@ -106,10 +126,44 @@ if __name__ == '__main__':
     app.run(debug=True)
 
 @app.route('/generate_text', methods=['POST'])
+@login_required
 def generate_text():
-    # Your text generation logic here
+    # Fetch the current user object from your database
+    user = current_user
+    
+    # Check if the user has remaining voice-over time
+    is_allowed, message = check_voice_over_limit(user)
+    if not is_allowed:
+        return jsonify({'status': 'Limit Reached', 'message': message})
+
+    # Your text and voice-over generation logic here
+    # If voice-over is generated, update voice_over_time_used attribute.
+    # For instance, if the voice-over took 10 seconds, then:
+    user.voice_over_time_used += 10  # or however much time was used
+    db.session.commit()
+
     # Ad placement logic here
     return jsonify({'text': 'Generated Text', 'ad': 'Ad Content'})
+
+
+@app.route('/generate_voice_over', methods=['POST'])
+@login_required  # Assuming the user must be logged in to access this route
+def generate_voice_over():
+    user = current_user  # Assuming you have a current_user object
+
+    # Logic to check voice-over time limit
+    if user.voice_over_time_used >= 600:  # Assuming 600 seconds (or 10 minutes) is the limit
+        return jsonify({'status': 'Voice-over time limit reached'})
+
+    # Actual voice-over generation logic here
+    # ...
+
+    # Update the voice_over_time_used after successful generation
+    user.voice_over_time_used += length_of_voice_over  # Update this variable accordingly
+    db.session.commit()  # Don't forget to commit the changes to the database
+
+    return jsonify({'voice_over_url': 'Generated Voice-over URL'})
+
 
 @app.route('/generate_video', methods=['POST'])
 def generate_video():
