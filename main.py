@@ -13,26 +13,10 @@ import numpy as np
 from PIL import Image, ImageFilter
 from flask import jsonify
 
-@app.route('/generate_voice_over', methods=['POST'])
-@login_required  # Assuming the user must be logged in to access this route
-def generate_voice_over():
-    user = current_user  # Assuming you have a current_user object
+from flask import jsonify
 
-    # Logic to check voice-over time limit
-    if user.voice_over_time_used >= 600:  # Assuming 600 seconds (or 10 minutes) is the limit
-        return jsonify({'status': 'Voice-over time limit reached'})
 
-    # Actual voice-over generation logic here
-    # ...
 
-    # Update the voice_over_time_used after successful generation
-    user.voice_over_time_used += length_of_voice_over  # Update this variable accordingly
-    db.session.commit()  # Don't forget to commit the changes to the database
-
-    return jsonify({'voice_over_url': 'Generated Voice-over URL'})
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
 
 @app.route('/authenticate', methods=['POST'])
 def authenticate():
@@ -152,7 +136,7 @@ def generate_voice_over():
     user = current_user  # Assuming you have a current_user object
 
     # Logic to check voice-over time limit
-    if user.voice_over_time_used >= 600:  # Assuming 600 seconds (or 10 minutes) is the limit
+    if user.voice_over_time_used >= 300:  # Assuming 300 seconds (or 5 minutes) is the limit
         return jsonify({'status': 'Voice-over time limit reached'})
 
     # Actual voice-over generation logic here
