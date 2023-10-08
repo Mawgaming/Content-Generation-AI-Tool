@@ -1,3 +1,4 @@
+docker build --progress=plain -t your-image-name .
 # Use an official Python runtime as a parent image
 FROM python:3.7-slim
 
