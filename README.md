@@ -1,54 +1,16 @@
-# Content-Generation-AI-Tool
-This is a Content Generation AI tool designed to assist in creating high-quality content for blogs, video scripts, and course materials. It also offers SEO optimization and basic content analytics.
+# Gummy Bear Studio API
 
-# Content Generation AI Tool
-
-## Description
-This is a Content Generation AI tool designed to assist in creating high-quality content for blogs, video scripts, and course materials. It also offers SEO optimization and basic content analytics.
+Gummy Bear Studio API is a comprehensive platform for music production services, offering functionalities like user authentication, payment processing, and content generation.
 
 ## Features
-- Text generation in various formats
-- SEO optimization
-- Script formatting for videos
-- User-friendly dashboard
-- Pre-built content templates
-- Integration with other tools
 
-## How to Use
-Detailed instructions on how to use this tool will be provided soon.
+- User authentication and management.
+- Payment processing with PayPal.
+- Content generation for text, voice-overs, videos, and images.
+- Integration with PayPal and Google AdSense.
 
-## Support
-For support, please send a small donation via PayPal to mwhitmeyer1985@gmail.com.
+## Installation
 
----
+1. Clone the repository:git clone [your-repository-url]2. Navigate to the project directory:cd [your-repository-name]3. Install the required dependencies:pip install -r requirements.txt## Usage
 
-## Single Purchase License
-
-By purchasing this software, you are granted a one-time license to use this software. Redistribution is not permitted. For support and updates, please send a small donation via PayPal to mwhitmeyer1985@gmail.com.
-# Content-Generation-AI-Tool
-This is a Content Generation AI tool designed to assist in creating high-quality content for blogs, video scripts, and course materials. It also offers SEO optimization and basic content analytics.
-
-# Content Generation AI Tool
-
-## Description
-This is a Content Generation AI tool designed to assist in creating high-quality content for blogs, video scripts, and course materials. It also offers SEO optimization and basic content analytics.
-
-## Features
-- Text generation in various formats
-- SEO optimization
-- Script formatting for videos
-- User-friendly dashboard
-- Pre-built content templates
-- Integration with other tools
-
-## How to Use
-Detailed instructions on how to use this tool will be provided soon.
-
-## Support
-For support, please send a small donation via PayPal to mwhitmeyer1985@gmail.com.
-
----
-
-## Single Purchase License
-
-By purchasing this software, you are granted a one-time license to use this software. Redistribution is not permitted. For support and updates, please send a small donation via PayPal to mwhitmeyer1985@gmail.com.
+1. Start the Flask server:
